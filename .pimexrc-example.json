@@ -1,0 +1,17 @@
+{
+  "db": {
+    "projectId": "",
+    "keyFilename": "",
+    "databaseURL": ""
+  },
+  "keysFolder": "",
+  "services": {
+    "pimex": {
+      "api": "",
+      "token": ""
+    },
+    "apps": {
+      "facebook": "http://localhost:3003/"
+    }
+  }
+}
