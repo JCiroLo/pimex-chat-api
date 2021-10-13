@@ -40,24 +40,24 @@ const addMessage = async data => {
     return oh.days === 'weekends'
   })
   if (typeof ifDay === 'object') {
-    addBotMessage(data, ifDay)
+    addBotMessage(data, ifDay, currentSeconds)
     return false
   } else if (typeof ifAll === 'object') {
-    addBotMessage(data, ifAll)
+    addBotMessage(data, ifAll, currentSeconds)
     return false
   } else if (
     typeof ifWeekDays === 'object' &&
     currentDay !== 'sunday' &&
     currentDay !== 'saturday'
   ) {
-    addBotMessage(data, ifWeekDays)
+    addBotMessage(data, ifWeekDays, currentSeconds)
     return false
   } else if (
     typeof ifWeekendDays === 'object' &&
     currentDay === 'sunday' &&
     currentDay === 'saturday'
   ) {
-    addBotMessage(data, ifWeekendDays)
+    addBotMessage(data, ifWeekendDays, currentSeconds)
     return false
   }
   return true
@@ -98,7 +98,7 @@ const insertMessage = async data => {
       }
     })
 }
-const addBotMessage = (messageData, ifData) => {
+const addBotMessage = (messageData, ifData, currentSeconds) => {
   const from = ifData.from.split(':')
   const fromSeconds =
     parseInt(from[0]) * 3600 + parseInt(from[1]) * 60 + parseInt(from[0])

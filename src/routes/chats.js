@@ -1,15 +1,15 @@
 'use strict'
 
 const {Router} = require('express')
-const {addChat, getChatConfig, updateChat} = require('../models/chat')
+const {addChat, getChatConfig, updateChat} = require('../models/chats')
 const router = Router()
 
 router.post('/', async ({body}, res) => {
-    console.log(body)
     try {
         const newChat = await addChat(body)
         res.status(201).json(newChat)
     } catch (e) {
+        console.log(e)
         res.status(400).json({message: 'Error, bad request'})
     }
 })
