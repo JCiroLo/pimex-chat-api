@@ -1,0 +1,17 @@
+{
+  "db": {
+    "projectId": "pimex-43b21",
+    "keyFilename": "pimex-firebase.json",
+    "databaseURL": "https: //pimex-chat-default-rtdb.firebaseio.com"
+  },
+  "keysFolder": "src/config",
+  "services": {
+    "pimex": {
+      "api": "https://api.pimex.co/v2",
+      "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExMiwiaWF0IjoxNTc0MTQ3MjA3fQ.YYdQd7sLHSbKLmRDVSqvAG3Y5VaaxXspUUzhfYKRLLg"
+    },
+    "apps": {
+      "facebook": "http://localhost:3003/"
+    }
+  }
+}
