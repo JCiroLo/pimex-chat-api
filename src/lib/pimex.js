@@ -14,12 +14,12 @@ const getBoard = async boardId => {
 }
 
 const addLead = async leadData => {
-  const { data } = await request.post(`${apiURL}conversions/`, leadData)
+  const { data } = await request.post(`${apiURL}/conversions/`, leadData)
   return data.data
 }
 
 const getUsersFromBoard = async boardId => {
-  const { data } = await request.get(`${apiURL}boards/${boardId}/users`, {
+  const { data } = await request.get(`${apiURL}/boards/${boardId}/users`, {
     headers: {
       Authorization: token
     }
@@ -28,7 +28,7 @@ const getUsersFromBoard = async boardId => {
 }
 
 const addNotification = async (idUser, data) => {
-  const alert = await request.post(`${apiURL}users/${idUser}/alerts`, data)
+  const alert = await request.post(`${apiURL}/users/${idUser}/alerts`, data)
   return alert.data
 }
 
