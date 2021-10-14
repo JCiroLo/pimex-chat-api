@@ -1,5 +1,6 @@
 const request = require('axios')
 const config = require('../config')
+const mixpanel = require('./mixpanel')
 
 const token = config.services.pimex.token
 const apiURL = config.services.pimex.api
@@ -15,6 +16,7 @@ const getBoard = async boardId => {
 
 const addLead = async leadData => {
   const { data } = await request.post(`${apiURL}/conversions/`, leadData)
+  mixpanel.track(`chat.leads`, { boardId: leadData.project }) // Track
   return data.data
 }
 

@@ -4,7 +4,7 @@ const { db, firestore } = require('../lib/db.js')
 const { sendNotification } = require('../lib/utils')
 const { sendMessageToFacebook } = require('../lib/integrations')
 const { getChatConfig } = require('./chat')
-const mixpanel = require('../plugins/tracker/index')
+const mixpanel = require('../lib/mixpanel')
 
 const days = [
   'sunday',
