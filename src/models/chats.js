@@ -1,6 +1,6 @@
 'use strict'
 
-const { db } = require('../lib/db.js')
+const { db, firestore } = require('../lib/db.js')
 const { getIcon, getColor } = require('../lib/random')
 const { addLead, getBoard } = require('../lib/pimex')
 
@@ -65,14 +65,12 @@ const addChat = async data => {
   }
 }
 
-const updateChat = async (chatId, data) => {
+const updateChat = async data => {
+  const chatId = data.id
   const chatRef = await db.collection('chats').doc(chatId)
-  try {
-    await chatRef.update({ ...data })
-    return 'Success'
-  } catch (e) {
-    return Promise.reject(e)
-  }
+  delete data.id
+  await chatRef.update({ ...data })
+  return { ...data, id: chatId }
 }
 
 const addChatConfig = async boardId => {
@@ -106,9 +104,31 @@ const getChatConfig = async boardId => {
   }
 }
 
+const fetchChats = async boardId => {
+  const querySnapshot = await db
+    .collection('chats')
+    .where('boardId', '==', boardId)
+    .orderBy('updatedAt', 'desc')
+    .get()
+  const chats = []
+  querySnapshot.forEach(e => chats.push({ id: e.id, ...e.data() }))
+  return chats
+}
+
+const increaseUnreadMessages = async chatId => {
+  await db
+    .collection('chats')
+    .doc(chatId)
+    .update({
+      unreadMessages: firestore.FieldValue.increment(1)
+    })
+}
+
 module.exports = {
   addChat,
   updateChat,
   addChatConfig,
-  getChatConfig
+  getChatConfig,
+  fetchChats,
+  increaseUnreadMessages
 }

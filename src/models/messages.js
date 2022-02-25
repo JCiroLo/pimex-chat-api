@@ -1,5 +1,3 @@
-'use strict'
-
 const { db, firestore } = require('../lib/db.js')
 const { sendNotification } = require('../lib/utils')
 const { sendMessageToFacebook } = require('../lib/integrations')
@@ -18,7 +16,7 @@ const days = [
 
 const addMessage = async data => {
   const boardId = data.boardId
-  insertMessage(data)
+  const res = await insertMessage(data)
   const { officeHours } = await getChatConfig(boardId)
   const currentDate = new Date()
   const currentDay = days[currentDate.getDay()]
@@ -41,26 +39,22 @@ const addMessage = async data => {
   })
   if (typeof ifDay === 'object') {
     addBotMessage(data, ifDay, currentSeconds)
-    return false
   } else if (typeof ifAll === 'object') {
     addBotMessage(data, ifAll, currentSeconds)
-    return false
   } else if (
     typeof ifWeekDays === 'object' &&
     currentDay !== 'sunday' &&
     currentDay !== 'saturday'
   ) {
     addBotMessage(data, ifWeekDays, currentSeconds)
-    return false
   } else if (
     typeof ifWeekendDays === 'object' &&
     currentDay === 'sunday' &&
     currentDay === 'saturday'
   ) {
     addBotMessage(data, ifWeekendDays, currentSeconds)
-    return false
   }
-  return true
+  return res
 }
 const insertMessage = async data => {
   const increment = firestore.FieldValue.increment(1)
@@ -74,29 +68,31 @@ const insertMessage = async data => {
     sendMessageToFacebook({
       board: chat.boardId,
       recipientId: chat.userId,
-      message: data.msg
+      message: data.message
     })
   }
-  db.collection('messages')
-    .add({
-      message: data.msg,
+  const res = await (
+    await db.collection('messages').add({
+      message: data.message,
       createdAt: new Date(),
       chatId: data.chatId,
       senderId: data.senderId,
       senderType: data.senderType
     })
-    .then(() => {
-      db.collection('chats')
-        .doc(data.chatId)
-        .update({
-          updatedAt: new Date(),
-          preview: data.msg,
-          unreadMessages: increment
-        })
-      if (data.senderId === 'client') {
-        sendNotification(data.boardId, data.msg)
-      }
+  ).get()
+
+  await db
+    .collection('chats')
+    .doc(data.chatId)
+    .update({
+      updatedAt: new Date(),
+      preview: data.message,
+      unreadMessages: increment
     })
+  if (data.senderId === 'client') {
+    sendNotification(data.boardId, data.message)
+  }
+  return { id: res.id, ...res.data() }
 }
 const addBotMessage = (messageData, ifData, currentSeconds) => {
   const from = ifData.from.split(':')
@@ -114,7 +110,18 @@ const addBotMessage = (messageData, ifData, currentSeconds) => {
     mixpanel.track('chat.customer.out-of-office-hours') // Track
   }
 }
+const fetchMessages = async chatId => {
+  const querySnapshot = await db
+    .collection('messages')
+    .where('chatId', '==', chatId)
+    .orderBy('createdAt')
+    .get()
+  const messages = []
+  querySnapshot.forEach(e => messages.push({ id: e.id, ...e.data() }))
+  return messages
+}
 
 module.exports = {
-  addMessage
+  addMessage,
+  fetchMessages
 }
